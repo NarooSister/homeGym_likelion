@@ -18,6 +18,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
     private final AuthenticationFacade facade;
 
+    // test
     private boolean isAuthenticated(Long instructorId) {
         Long currentInstructorId = facade.getCurrentInstructor().getId();
         return currentInstructorId.equals(instructorId);
