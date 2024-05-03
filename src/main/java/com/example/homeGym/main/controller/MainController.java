@@ -9,13 +9,18 @@ import com.example.homeGym.instructor.entity.*;
 import com.example.homeGym.instructor.repository.CommentRepository;
 import com.example.homeGym.instructor.repository.ScheduleRepository;
 import com.example.homeGym.instructor.service.*;
+import com.example.homeGym.order.controller.OrderController;
+import com.example.homeGym.order.dto.ProgramOrderDto;
 import com.example.homeGym.user.dto.ReviewDto;
+import com.example.homeGym.user.dto.UserDto;
 import com.example.homeGym.user.entity.Apply;
 import com.example.homeGym.user.entity.User;
 import com.example.homeGym.user.service.ApplyService;
 import com.example.homeGym.user.service.ReviewService;
 import com.example.homeGym.user.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -23,7 +28,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,8 +119,9 @@ public class MainController {
             Long programId,
             HttpServletRequest request,
             RedirectAttributes redirectAttributes,
-            Authentication authentication
-    ) {
+            Authentication authentication,
+            HttpServletResponse response
+    ) throws IOException {
         String week = request.getParameter("week");
         String time = request.getParameter("time");
         String count = request.getParameter("count");
@@ -124,9 +133,28 @@ public class MainController {
             return "redirect:/main/introduce/program/" + programId;
         }
         Long userId = authenticationUtilService.getId(authentication);
-        applyService.saveApply(week, time, count, userId, programId );
 
-        return "redirect:/main/introduce/program/" + programId;
+        //여기서 정보 Program_order 테이블에 주입
+        //필요한 정보들
+        ProgramOrderDto programOrderDto = new ProgramOrderDto();
+        programOrderDto.setProgramId(programId);
+        programOrderDto.setUserId(userId);
+        programOrderDto.setCount(count);
+        programOrderDto.setWeek(week);
+        programOrderDto.setTime(time);
+
+        //정보를 controller에 넘겨줌
+        String redirectUrl = UriComponentsBuilder.fromUriString("/orders/payment")
+                .queryParam("programId", programOrderDto.getProgramId())
+                .queryParam("userId", programOrderDto.getUserId())
+                .queryParam("count", programOrderDto.getCount())
+                .queryParam("week", programOrderDto.getWeek())
+                .queryParam("time", programOrderDto.getTime())
+                .toUriString();
+//        applyService.saveApply(week, time, count, userId, programId );
+
+        return "redirect:" + redirectUrl;
+//        return "redirect:/main/introduce/program/" + programId;
     }
 
 

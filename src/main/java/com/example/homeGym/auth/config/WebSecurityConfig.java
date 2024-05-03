@@ -65,7 +65,7 @@ public class WebSecurityConfig {
                                 "/main/introduce/program/{programId}/apply"
 
                         )
-                        .hasRole("USER") // 유저 권한을 가진 사용자만 접근 가능
+                        .hasAnyRole("USER", "ADMIN") // 유저 권한을 가진 사용자만 접근 가능
 
                         .requestMatchers(
                               "/instructor/accept/**",

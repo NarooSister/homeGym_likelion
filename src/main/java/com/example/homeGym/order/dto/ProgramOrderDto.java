@@ -1,6 +1,8 @@
 package com.example.homeGym.order.dto;
 
+import com.example.homeGym.instructor.entity.Program;
 import com.example.homeGym.order.entity.ProgramOrder;
+import com.example.homeGym.user.dto.UserDto;
 import lombok.*;
 
 @Data
@@ -19,6 +21,13 @@ public class ProgramOrderDto {
 
     private String tossPaymentKey;
     private String tossOrderId;
+
+    private UserDto userDto;
+    private Program program;
+
+    private String week;
+    private String time;
+    private String count;
 
     public static ProgramOrderDto fromEntity(ProgramOrder order) {
         return ProgramOrderDto.builder()
